@@ -123,6 +123,21 @@
     }
 
     function step() {
+        var availableBullets = $.map(engine.bullets, function(b, i) {
+            return {
+                bot: {
+                    id: b.bot.id,
+                    pos: b.bot.pos,
+                    health: b.bot.health,
+                    prevCommand: b.bot.prevCommand,
+                    prevPos: b.bot.prevPos
+                },
+                pos: b.pos,
+                dir: b.dir,
+                vel: b.vel
+            }
+        });
+
         engine.bullets = $.grep(engine.bullets, function(bullet, i) {
             bullet.pos.add(bullet.vel);
 
@@ -168,7 +183,7 @@
                     }
                 });
 
-                var choice = bot.bot.update(bot.pos, bot.health, bot.reload, availableBots, engine.bullets);
+                var choice = bot.bot.update(bot.pos, bot.health, bot.reload, availableBots, availableBullets);
                 switch(choice.id) {
                     case _MoveUp:    bot.pos.y--; break;
                     case _MoveDown:  bot.pos.y++; break;
