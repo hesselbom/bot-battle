@@ -91,6 +91,11 @@
                 botWrapper.bot.init(botWrapper.id);
                 window.Renderer.addBot(botWrapper);
                 window.Bot = null;
+
+                if (engine.bots.length >= START_POSITIONS.length) {
+                    $('[data-bot]').addClass('disabled');
+                    return;
+                }
             });
     }
 
