@@ -1,7 +1,7 @@
 Bot = {
-    name: 'TestBot',
+    name: 'Test Bot',
     image: '/media/mario.png',
-    init: function() {
+    init: function(id) {
         this.shots = 0;
     },
     update: function(pos, health, reload, bots, bullets) {

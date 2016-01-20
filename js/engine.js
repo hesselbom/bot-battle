@@ -42,7 +42,8 @@
             bullets: [],
             running: false
         },
-        _runningInterval;
+        _runningInterval,
+        _botIds = 1;
 
     function degToVec(degreesOrVector) {
         if (degreesOrVector instanceof Vector2) {
@@ -75,6 +76,7 @@
         $.getScript('/js/bots/' + name + '.js')
             .done(function() {
                 var botWrapper = {
+                    id: _botIds++,
                     pos: START_POSITIONS[engine.bots.length].clone(),
                     topLeft: new Vector2(0, 0),
                     btmRight: new Vector2(0, 0),
@@ -86,7 +88,7 @@
                 };
                 updateBounds(botWrapper);
                 engine.bots.push(botWrapper);
-                botWrapper.bot.init();
+                botWrapper.bot.init(botWrapper.id);
                 window.Renderer.addBot(botWrapper);
                 window.Bot = null;
             });
@@ -153,6 +155,7 @@
                     return bot !== b;
                 }), function(b, i) {
                     return {
+                        id: b.id,
                         pos: b.pos,
                         health: b.health,
                         prevCommand: b.prevCommand,

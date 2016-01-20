@@ -15,6 +15,9 @@ Ottobots.MAX_HEALTH | Maximum health on a bot
 ### Methods
 
 #### init
+Parameter | Description
+--------- | -------------
+id        | Bot id, used to compare bots
 
 This method gets called when creating bot. To setup initial values.
 

@@ -76,11 +76,13 @@ gulp.task('inject-bots', function() {
             transform: function (filepath, file, i, length) {
                 var fileContent = fs.readFileSync('.' + filepath, 'utf8');
                 var imgMatch = (/image\s*:\s*['"](.+)['"]/gi.exec(fileContent));
+                var nameMatch = (/name\s*:\s*['"](.+)['"]/gi.exec(fileContent));
                 var image = imgMatch[1];
-                var name = filepath.substring('/js/bots/'.length, filepath.length - '.js'.length);
-                return 'li: a(data-bot="'+name+'").button' +
+                var name = nameMatch[1];
+                var file = filepath.substring('/js/bots/'.length, filepath.length - '.js'.length);
+                return 'li: a(data-bot="'+file+'").button' +
                     '\n            img(src="'+image+'")' +
-                    '\n            span ' + name;
+                    '\n            span '+name;
             }
         }))
         .pipe(gulp.dest('./jade/'));
