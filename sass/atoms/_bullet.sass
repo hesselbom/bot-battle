@@ -1,8 +1,9 @@
 +exports('atoms/bullet')
   .bullet
     position: absolute
-    top: $bot-width / 2 - rem-calc(1)
-    left: $bot-height / 2 - rem-calc(1)
-    width: rem-calc(2)
-    height: rem-calc(2)
+    top: $bot-width / 2 - $bullet-size / 2
+    left: $bot-height / 2 - $bullet-size / 2
+    width: $bullet-size
+    height: $bullet-size
+    border-radius: 50%
     background: #444
