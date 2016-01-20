@@ -5,10 +5,11 @@ Ottobots
 
 ### Global object
 
-Property  | Description
---------- | -------------
-Ottobots.MIN_POS | Minimum position on map as Vector2
-Ottobots.MAX_POS | Maximum position on map as Vector2
+Property            | Description
+------------------- | -------------
+Ottobots.MIN_POS    | Minimum position on map as Vector2
+Ottobots.MAX_POS    | Maximum position on map as Vector2
+Ottobots.MAX_HEALTH | Maximum health on a bot
 
 
 ### Methods
@@ -27,7 +28,7 @@ Parameter | Description
 pos       | My position as Vector2
 health    | My health left
 reload    | Amount of frames left until you can shoot again
-bots      | An array of all bots (including you)
+bots      | An array of all bots (excluding you)
 bullets   | An array of all bullets (including your own)
 
 ##### Return

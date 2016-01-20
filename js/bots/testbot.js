@@ -22,11 +22,13 @@ Bot = {
         }
         if (pos.x === 70 && this.shots === 3) {
             this.shots++;
-            return Shoot(135);
+            return Shoot(new Vector2(2, 2));
         }
-        if (pos.x === 70 && this.shots === 4) {
-            this.shots++;
-            return Shoot(135);
+        for (var i = 0; i < bots.length; i++) {
+            if (pos.x === bots[i].pos.x && this.shots === 4) {
+                this.shots++;
+                return Shoot(180);
+            }
         }
         return MoveRight;
     }

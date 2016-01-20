@@ -93,11 +93,12 @@
     }
 
     function addBullet(bot, dir) {
+        var direction = degToVec(dir).normalize();
         var bullet = {
             bot: bot,
             pos: bot.pos.clone(),
-            dir: degToVec(dir),
-            vel: degToVec(dir).multiplyScalar(BULLET_SPEED)
+            dir: direction,
+            vel: direction.multiplyScalar(BULLET_SPEED)
         };
         engine.bullets.push(bullet);
         return bullet;
@@ -115,15 +116,6 @@
     }
 
     function step() {
-        var availableBots = $.map(engine.bots, function(bot, i) {
-            return {
-                pos: bot.pos,
-                health: bot.health,
-                prevCommand: bot.prevCommand,
-                prevPos: bot.prevPos
-            }
-        });
-
         engine.bullets = $.grep(engine.bullets, function(bullet, i) {
             bullet.pos.add(bullet.vel);
 
@@ -156,6 +148,17 @@
         $.each(engine.bots, function(i, bot) {
             if (bot.health > 0) {
                 if (bot.reload > 0) bot.reload--;
+
+                var availableBots = $.map($.grep(engine.bots, function(b, i) {
+                    return bot !== b;
+                }), function(b, i) {
+                    return {
+                        pos: b.pos,
+                        health: b.health,
+                        prevCommand: b.prevCommand,
+                        prevPos: b.prevPos
+                    }
+                });
 
                 var choice = bot.bot.update(bot.pos, bot.health, bot.reload, availableBots, engine.bullets);
                 switch(choice.id) {
