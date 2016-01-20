@@ -1,0 +1,32 @@
+=rgba-bg($colorobject)
+  @if length($colorobject) > 1
+    $color: nth($colorobject, 1)
+    $alpha: nth($colorobject, 2)
+
+    $rgba: rgba($color, $alpha)
+    $ie-hex-str: ie-hex-str($rgba)
+    background-color: transparent
+    background-color: $rgba
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#{$ie-hex-str},endColorstr=#{$ie-hex-str})
+    zoom: 1
+  @else
+    background-color: $colorobject
+
+=opacity($opacity)
+  $opacity100: $opacity * 100
+  opacity: $opacity
+  zoom: 1
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=#{$opacity100})"
+  filter: alpha(opacity=$opacity100)
+
+//**
+// Include nth-child with IE fallback class
+//
+// @param $nth      nth-child
+//
+=nth-child($nth)
+  &:nth-child(#{$nth})
+    @content
+
+  &.nth-child-#{$nth}
+      @content

@@ -1,0 +1,65 @@
+doctype html
+<!--[if lt IE 7 ]> <html class="ie ie6 lt-ie9 no-js"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7 lt-ie9 no-js"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8 lt-ie9 no-js"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9 no-js"> <![endif]-->
+<!--[if gt IE 9 ]> <html class="ie no-js"> <![endif]-->
+<!--[if !(IE)]><!-->
+html.no-js
+  <!--<![endif]-->
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+
+    block title
+      title Ottobots
+
+    link(rel='stylesheet', type='text/css' href='css/font-awesome/css/font-awesome.min.css')
+    link(rel='stylesheet', type='text/css' href='css/style.css')
+
+    <!--[if lt IE 9]>
+    script(src="js/polyfills/html5shiv.js")
+    <![endif]-->
+
+  body(data-grid-gutterwidth='20px')
+    .row: .columns.text-center
+      h1 Ottobots
+
+      .battlefield-wrapper
+        #battlefield.battlefield
+
+    .row
+      .medium-4.medium-offset-2.columns
+        h4 Add bot
+        ul.bot-list
+          // Inject bots
+          li: a(data-bot="testbot").button
+            img(src="/media/mario.png")
+            span testbot
+          li: a(data-bot="testbot2").button
+            img(src="/media/mario2.png")
+            span testbot2
+          // /Inject bots
+      .medium-4.columns.text-right.end
+        ul.button-group
+          li: a(data-play).button.success
+            span.fa.fa-play.fa-fw
+            | Play
+          li: a(data-pause).button.secondary.disabled
+            span.fa.fa-pause.fa-fw
+            | Pause
+
+    block scripts
+      // Polyfills
+      script(src='js/polyfills/rAF.js')
+
+      // Libs
+      script(src='js/libs/modernizr/modernizr.js')
+      script(src='js/libs/jquery/dist/jquery.min.js')
+      script(src='js/libs/jquery.easing/js/jquery.easing.min.js')
+      script(src='js/libs/three.js/three.js')
+
+      // 
+      script(src='js/main.js')
+      script(src='js/engine.js')

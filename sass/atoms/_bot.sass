@@ -1,0 +1,30 @@
++exports('atoms/bot')
+  .bot
+    transition: opacity $transition
+    width: $bot-width
+    height: $bot-height
+    position: absolute
+    z-index: 1
+    top: 0
+    left: 0
+
+    &._dead
+      opacity: 0.3
+
+    &:before
+      content: ''
+      position: absolute
+      top: $bot-health-offset
+      left: 0
+      width: 100%
+      height: $bot-health-height
+      background: #ccc
+
+    .health
+      transition: width $transition
+      position: absolute
+      top: $bot-health-offset
+      left: 0
+      width: 100%
+      height: $bot-health-height
+      background: #8cad6c

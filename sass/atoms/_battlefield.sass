@@ -1,0 +1,25 @@
++exports('atoms/battlefield')
+  .battlefield
+    background: $white
+    border: $battlefield-border solid #555
+    box-sizing: content-box
+    display: inline-block
+    width: $battlefield-width
+    height: $battlefield-height
+    position: relative
+
+    &:after
+      content: ''
+      position: absolute
+      top: $bot-width / 2
+      left: $bot-height / 2
+      bottom: $bot-width / 2
+      right: $bot-height / 2
+      border: 1px solid #ddd
+
+  .battlefield-wrapper
+    display: inline-block
+    overflow: hidden
+    width: $battlefield-width + $battlefield-border * 2
+    height: $battlefield-height + $battlefield-border * 2
+    margin-bottom: 2rem
