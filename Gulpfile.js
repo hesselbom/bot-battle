@@ -11,13 +11,10 @@ var pixrem = require('gulp-pixrem');
 var inject = require('gulp-inject');
 var fs = require("fs");
 var uglify = require('gulp-uglify');
+var obfuscate = require('gulp-obfuscate');
 
 gulp.task('clean:prod', function () {
   return del(['prod/*']);
-});
-
-gulp.task('clean:bots', function () {
-  return del(['compiled-bots/*']);
 });
 
 gulp.task('iconfont', function(){
@@ -67,9 +64,13 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('scripts:bots', function() {
-    return gulp.src('js/bots/*.js', {base: './js/bots'})
+    return gulp.src('js/bots/dev/*.js', {base: './js/bots/dev'})
+        .pipe(obfuscate({
+            replaceMethod: obfuscate.ZALGO,
+            exclude: ['name', 'image', 'init', 'update']
+        }))
         .pipe(uglify())
-        .pipe(gulp.dest('./compiled-bots/'));
+        .pipe(gulp.dest('./js/bots/'));
 });
 
 gulp.task('images', function() {
@@ -86,8 +87,8 @@ gulp.task('inject-bots', function() {
             endtag: '// /Inject bots',
             transform: function (filepath, file, i, length) {
                 var fileContent = fs.readFileSync('.' + filepath, 'utf8');
-                var imgMatch = (/image\s*:\s*['"](.+)['"]/gi.exec(fileContent));
-                var nameMatch = (/name\s*:\s*['"](.+)['"]/gi.exec(fileContent));
+                var imgMatch = (/image\s*:\s*['"]([^"']+)['"]/gi.exec(fileContent));
+                var nameMatch = (/name\s*:\s*['"]([^"']+)['"]/gi.exec(fileContent));
                 var image = imgMatch[1];
                 var name = nameMatch[1];
                 var file = filepath.substring('/js/bots/'.length, filepath.length - '.js'.length);
@@ -167,6 +168,7 @@ gulp.task('watch',function() {
     gulp.watch('sass/style.s[ca]ss', ['styles']);
     gulp.watch('css/**/*', ['styles']);
     gulp.watch('jade/**/*.jade', ['templates']);
+    gulp.watch('js/bots/dev/*.js', ['scripts:bots']);
     gulp.watch('js/**/*.js', ['scripts']);
     gulp.watch('img/**/*', ['images']);
     gulp.watch('media/**/*', ['images']);
@@ -174,7 +176,6 @@ gulp.task('watch',function() {
     gulp.watch('fonts/**/*', ['iconfont']);
 });
 
-gulp.task('build:dev', ['iconfont', 'images', 'scripts', 'inject-bots', 'templates', 'inject-sass', 'styles']);
+gulp.task('build:dev', ['iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
 gulp.task('default', ['build:dev', 'webserver', 'watch']);
 // gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
-gulp.task('build-bots', ['clean:bots', 'scripts:bots']);

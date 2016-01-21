@@ -2,4 +2,6 @@
 node_modules
 prod
 .DS_Store
-compiled-bots
+js/bots/dev/*
+!js/bots/dev/testbot.js
+!js/bots/dev/emptybot.js

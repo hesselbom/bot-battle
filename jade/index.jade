@@ -34,12 +34,12 @@ html.no-js
         h4 Add bot
         ul.bot-list
           // Inject bots
+          li: a(data-bot="emptybot").button
+            img(src="http://placehold.it/32x32")
+            span Empty Bot
           li: a(data-bot="testbot").button
             img(src="/media/mario.png")
             span Test Bot
-          li: a(data-bot="testbot2").button
-            img(src="http://placehold.it/32x32")
-            span Empty Bot
           // /Inject bots
       .medium-4.columns.text-right.end
         ul.button-group
