@@ -6,12 +6,12 @@ window.Renderer = (function($) {
     return {
         init: function(engine) {
             this._engine = engine;
-            this.startRendering();
+            this._startRendering();
         },
         addBullet: function(bullet) {
             var $el = $('<div class="bullet">').appendTo($arena);
             bullet.$el = $el;
-            this.updatePos(bullet);
+            this._updatePos(bullet);
         },
         killBullet: function(bullet) {
             bullet.$el.remove();
@@ -30,20 +30,21 @@ window.Renderer = (function($) {
         killBot: function(bot) {
             bot.$el.addClass('_dead');
         },
-        startRendering: function() {
-            requestAnimationFrame(this.render.bind(this));
+
+        _startRendering: function() {
+            requestAnimationFrame(this._render.bind(this));
         },
-        render: function() {
+        _render: function() {
             var _this = this;
             $.each(this._engine.bullets, function(i, bullet) {
-                _this.updatePos(bullet);
+                _this._updatePos(bullet);
             });
             $.each(this._engine.bots, function(i, bot) {
-                _this.updatePos(bot);
+                _this._updatePos(bot);
             });
-            requestAnimationFrame(this.render.bind(this));
+            requestAnimationFrame(this._render.bind(this));
         },
-        updatePos: function(entity) {
+        _updatePos: function(entity) {
             if (typeof entity.$el !== 'undefined') {
                 entity.$el.css('transform', 'translate('+entity.pos.x+'px,'+entity.pos.y+'px)');
             }
