@@ -1,4 +1,4 @@
-Ottobots
+BotBattle
 ========
 
 Bot battles!
@@ -21,9 +21,9 @@ This will run a server at __localhost:1337__ with all the bots and battlefield
 
 Property            | Description
 ------------------- | -------------
-Ottobots.MIN_POS    | Minimum position on map as Vector2
-Ottobots.MAX_POS    | Maximum position on map as Vector2
-Ottobots.MAX_HEALTH | Maximum health on a bot
+BotBattle.MIN_POS    | Minimum position on map as Vector2
+BotBattle.MAX_POS    | Maximum position on map as Vector2
+BotBattle.MAX_HEALTH | Maximum health on a bot
 
 
 ### Methods

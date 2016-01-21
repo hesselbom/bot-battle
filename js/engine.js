@@ -31,7 +31,7 @@
         return Enum(_Shoot, degToVec(degreesOrVector));
     };
 
-    window.Ottobots = {
+    window.BotBattle = {
         MIN_POS: MIN_POS,
         MAX_POS: MAX_POS,
         MAX_HEALTH: MAX_HEALTH

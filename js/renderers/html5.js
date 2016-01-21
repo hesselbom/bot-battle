@@ -25,7 +25,7 @@ window.Renderer = (function($) {
             this.updatePos(bot);
         },
         botHit: function(bot) {
-            $('.health', bot.$el).css('width', Math.round(100 * (bot.health / Ottobots.MAX_HEALTH))+'%');
+            $('.health', bot.$el).css('width', Math.round(100 * (bot.health / BotBattle.MAX_HEALTH))+'%');
         },
         killBot: function(bot) {
             bot.$el.addClass('_dead');
