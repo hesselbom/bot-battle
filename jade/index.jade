@@ -42,13 +42,15 @@ html.no-js
             span Test Bot
           // /Inject bots
       .medium-4.columns.text-right.end
-        ul.button-group
-          li: a(data-play).button.success
+        ul.button-group._controls
+          li: a(data-play).button
             span.fa.fa-play.fa-fw
             | Play
-          li: a(data-pause).button.secondary.disabled
+          li: a(data-pause).button.disabled
             span.fa.fa-pause.fa-fw
             | Pause
+        label FPS
+          input(type='number', min='1', max='1000', step='1', value='100', placeholder='100', data-fps)
 
     block scripts
       // Polyfills

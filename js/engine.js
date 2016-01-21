@@ -210,7 +210,12 @@
     }
 
     function getFps() {
-        return 10;
+        var $input = $('[data-fps]'),
+            fps = parseInt($input.val());
+        if (fps <= 0) fps = 1;
+        if (fps >= 1000) fps = 1000;
+        $input.val(fps);
+        return 1000 / fps;
     }
 
     function play() {
@@ -219,6 +224,7 @@
 
         $('[data-play]').addClass('disabled');
         $('[data-pause]').removeClass('disabled');
+        $('[data-fps]').attr('disabled', 'disabled');
     }
 
     function pause() {
@@ -228,6 +234,7 @@
 
         $('[data-play]').removeClass('disabled');
         $('[data-pause]').addClass('disabled');
+        $('[data-fps]').attr('disabled', null);
     }
 
     initRenderer();
