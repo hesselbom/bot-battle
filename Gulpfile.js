@@ -10,9 +10,14 @@ var autoprefixer = require('gulp-autoprefixer');
 var pixrem = require('gulp-pixrem');
 var inject = require('gulp-inject');
 var fs = require("fs");
+var uglify = require('gulp-uglify');
 
 gulp.task('clean:prod', function () {
   return del(['prod/*']);
+});
+
+gulp.task('clean:bots', function () {
+  return del(['compiled-bots/*']);
 });
 
 gulp.task('iconfont', function(){
@@ -59,6 +64,12 @@ gulp.task('scripts', function() {
         .pipe(gulp.dest('./.tmp/js/'));
     gulp.src('js/**/*.map', {base: './js'})
         .pipe(gulp.dest('./.tmp/js/'));
+});
+
+gulp.task('scripts:bots', function() {
+    return gulp.src('js/bots/*.js', {base: './js/bots'})
+        .pipe(uglify())
+        .pipe(gulp.dest('./compiled-bots/'));
 });
 
 gulp.task('images', function() {
@@ -165,4 +176,5 @@ gulp.task('watch',function() {
 
 gulp.task('build:dev', ['iconfont', 'images', 'scripts', 'inject-bots', 'templates', 'inject-sass', 'styles']);
 gulp.task('default', ['build:dev', 'webserver', 'watch']);
-gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
+// gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
+gulp.task('build-bots', ['clean:bots', 'scripts:bots']);
