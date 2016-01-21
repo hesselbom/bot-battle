@@ -15,6 +15,11 @@ gulp.task('clean:prod', function () {
   return del(['prod/*']);
 });
 
+gulp.task('iconfont', function(){
+    gulp.src('fonts/**/*', {base: './fonts'})
+        .pipe(gulp.dest('./.tmp/fonts/'));
+});
+
 gulp.task('styles', function() {
     gulp.src('sass/**/*.s[ac]ss')
         .pipe(sass().on('error', sass.logError))
@@ -146,8 +151,9 @@ gulp.task('watch',function() {
     gulp.watch('js/**/*.js', ['scripts']);
     gulp.watch('img/**/*', ['images']);
     gulp.watch('media/**/*', ['images']);
+    gulp.watch('fonts/**/*', ['iconfont']);
 });
 
-gulp.task('build:dev', ['images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
+gulp.task('build:dev', ['iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
 gulp.task('default', ['build:dev', 'webserver', 'watch']);
 // gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
