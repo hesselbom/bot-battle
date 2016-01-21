@@ -11,8 +11,8 @@ var fs = require("fs");
 var uglify = require('gulp-uglify');
 var obfuscate = require('gulp-obfuscate');
 
-gulp.task('clean:prod', function () {
-  return del(['prod/*']);
+gulp.task('clean:tmp', function () {
+  return del(['.tmp/*']);
 });
 
 gulp.task('iconfont', function(){
@@ -154,6 +154,6 @@ gulp.task('watch',function() {
     gulp.watch('fonts/**/*', ['iconfont']);
 });
 
-gulp.task('build:dev', ['iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
+gulp.task('build:dev', ['clean:tmp', 'iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
 gulp.task('default', ['build:dev', 'webserver', 'watch']);
 // gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
