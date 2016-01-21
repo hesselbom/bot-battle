@@ -7,6 +7,8 @@ Implement your bots in __/js/bots/dev/__ and they will appear as options. See __
 
 ## Installation
 
+You need npm (https://www.npmjs.com/) and bower (http://bower.io/) installed. Then run:
+
     npm install; bower install
 
 ## Running
