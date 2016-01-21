@@ -21,6 +21,9 @@
 
     $(function() {
         switch(getUrlParameter('renderer')) {
+            case '3d':
+                $.getScript('/js/renderers/3d.js');
+                break;
             case 'html5':
             default:
                 $.getScript('/js/renderers/html5.js');

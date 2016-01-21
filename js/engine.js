@@ -8,7 +8,6 @@
         RELOAD_FRAMES = 30,
         MAX_HEALTH = 5,
         BULLET_SPEED = 2,
-        UPDATE_INTERVAL = 10,
         BOT_WIDTH = 32,
         BOT_HEIGHT = 32,
         ARENA_WIDTH = 800,
@@ -34,7 +33,11 @@
     window.BotBattle = {
         MIN_POS: MIN_POS,
         MAX_POS: MAX_POS,
-        MAX_HEALTH: MAX_HEALTH
+        MAX_HEALTH: MAX_HEALTH,
+        BOT_WIDTH: BOT_WIDTH,
+        BOT_HEIGHT: BOT_HEIGHT,
+        ARENA_WIDTH: ARENA_WIDTH,
+        ARENA_HEIGHT: ARENA_HEIGHT
     };
 
     var engine = {
@@ -206,9 +209,13 @@
         });
     }
 
+    function getFps() {
+        return 10;
+    }
+
     function play() {
         pause();
-        _runningInterval = setInterval(step, UPDATE_INTERVAL);
+        _runningInterval = setInterval(step, getFps());
 
         $('[data-play]').addClass('disabled');
         $('[data-pause]').removeClass('disabled');

@@ -6,7 +6,7 @@ window.Renderer = (function($) {
     return {
         init: function(engine) {
             this._engine = engine;
-            this._startRendering();
+            this._render();
         },
         addBullet: function(bullet) {
             var $el = $('<div class="bullet">').appendTo($arena);
@@ -31,9 +31,6 @@ window.Renderer = (function($) {
             bot.$el.addClass('_dead');
         },
 
-        _startRendering: function() {
-            requestAnimationFrame(this._render.bind(this));
-        },
         _render: function() {
             var _this = this;
             $.each(this._engine.bullets, function(i, bullet) {

@@ -1,1 +1,1 @@
-Bot={name:"Empty Bot",image:"http://placehold.it/32x32",init:function(t){},update:function(t,n,i,o,e){return DoNothing}};
+Bot={name:"Empty Bot",image:"/media/32x32.png",init:function(n){},update:function(n,t,i,o,e){return DoNothing}};
