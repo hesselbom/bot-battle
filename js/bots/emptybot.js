@@ -1,1 +1,0 @@
-Bot={name:"Empty Bot",image:"/media/32x32.png",init:function(n){},update:function(n,t,i,o,e){return DoNothing}};
