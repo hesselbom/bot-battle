@@ -1,0 +1,37 @@
+/**
+ * Keyframes
+ *
+ * @mixin keyframes
+ * @param $name Name of keyframe
+ */
+=keyframes($name)
+  @-webkit-keyframes #{$name}
+    @content
+  @-moz-keyframes #{$name}
+    @content
+  @-ms-keyframes #{$name}
+    @content
+  @-o-keyframes #{$name}
+    @content
+  @keyframes #{$name}
+    @content
+
+/**
+ * Animation prefixes
+ *
+ * @mixin animation
+ * @param $props Animation props
+ */
+=animation($props)
+  -webkit-animation: #{$props}
+  animation: #{$props}
+
+/**
+ * Add no-animation class to help with handling
+ * Problem with transitioning height: auto
+ *
+ * @mixin handle-ios-height-toggle
+ */
+=handle-ios-height-toggle()
+  .touch &.no-animation
+    transition: none

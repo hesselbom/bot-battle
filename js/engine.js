@@ -165,6 +165,18 @@
             });
             if (hitPlayer) {
                 window.Renderer.killBullet(bullet);
+
+                var winner = null,
+                    botsAlive = 0;
+                $.each(engine.bots, function(i, bot) {
+                    if (bot.health > 0) {
+                        winner = bot;
+                        botsAlive++;
+                    }
+                });
+                if (botsAlive === 1) {
+                    botWon(winner);
+                }
                 return false;
             }
 
@@ -207,6 +219,10 @@
                 bot.prevPos = bot.pos.clone();
             }
         });
+    }
+
+    function botWon(bot) {
+        $('#battlefield').append($('<div class="battlefield__winner">').append($('<span>').text(bot.bot.name + ' won!')));
     }
 
     function getFps() {
