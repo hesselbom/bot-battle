@@ -1,6 +1,20 @@
 Ottobots
 ========
 
+Bot battles!
+
+Implement your bots in __/js/bots/dev/__ and they will appear as options. See __/js/bots/dev/testbot.js__ or __/js/bots/dev/emptybot.js__ for examples.
+
+## Installation
+
+    npm install; bower install
+
+## Running
+
+    gulp
+
+This will run a server at __localhost:1234__ with all the bots and battlefield
+
 ## API
 
 ### Global object
