@@ -13,7 +13,7 @@ Implement your bots in __/js/bots/dev/__ and they will appear as options. See __
 
     gulp
 
-This will run a server at __localhost:1234__ with all the bots and battlefield
+This will run a server at __localhost:1337__ with all the bots and battlefield
 
 ## API
 
