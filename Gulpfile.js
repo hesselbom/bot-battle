@@ -2,8 +2,6 @@ var gulp = require('gulp');
 var sass = require('gulp-sass');
 var jade = require('gulp-jade');
 var connect = require('gulp-connect');
-var iconfont = require('gulp-iconfont');
-var iconfontCss = require('gulp-iconfont-css');
 var runTimestamp = Math.round(Date.now()/1000);
 var del = require('del');
 var autoprefixer = require('gulp-autoprefixer');
@@ -15,30 +13,6 @@ var obfuscate = require('gulp-obfuscate');
 
 gulp.task('clean:prod', function () {
   return del(['prod/*']);
-});
-
-gulp.task('iconfont', function(){
-    gulp.src('fonts/**/*', {base: './fonts'})
-        .pipe(gulp.dest('./.tmp/fonts/'));
-
-  // return gulp.src(['icons/*.svg'])
-  //   .pipe(iconfontCss({
-  //     fontName: 'icons',
-  //     path: 'sass/templates/_icons.scss',
-  //     targetPath: '../../sass/_icons.scss',
-  //     fontPath: '../fonts/'
-  //   }))
-  //   .pipe(iconfont({
-  //     fontName: 'icons', // required 
-  //     appendUnicode: true, // recommended option 
-  //     formats: ['ttf', 'eot', 'woff'], // default, 'woff2' and 'svg' are available 
-  //     timestamp: runTimestamp, // recommended to get consistent builds when watching files 
-  //   }))
-  //   .on('glyphs', function(glyphs, options) {
-  //       // CSS templating, e.g. 
-  //       console.log(glyphs, options);
-  //   })
-  //   .pipe(gulp.dest('./.tmp/fonts/'));
 });
 
 gulp.task('styles', function() {
@@ -172,10 +146,8 @@ gulp.task('watch',function() {
     gulp.watch('js/**/*.js', ['scripts']);
     gulp.watch('img/**/*', ['images']);
     gulp.watch('media/**/*', ['images']);
-    gulp.watch('icons/**/*', ['iconfont']);
-    gulp.watch('fonts/**/*', ['iconfont']);
 });
 
-gulp.task('build:dev', ['iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
+gulp.task('build:dev', ['images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
 gulp.task('default', ['build:dev', 'webserver', 'watch']);
 // gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
