@@ -10,6 +10,7 @@ var inject = require('gulp-inject');
 var fs = require("fs");
 var uglify = require('gulp-uglify');
 var obfuscate = require('gulp-obfuscate');
+var gulpsync = require('gulp-sync')(gulp);
 
 gulp.task('clean:tmp', function () {
   return del(['.tmp/*']);
@@ -154,6 +155,6 @@ gulp.task('watch',function() {
     gulp.watch('fonts/**/*', ['iconfont']);
 });
 
-gulp.task('build:dev', ['clean:tmp', 'iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']);
-gulp.task('default', ['build:dev', 'webserver', 'watch']);
+gulp.task('build:dev', gulpsync.sync(['clean:tmp', 'iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']));
+gulp.task('default', gulpsync.sync(['build:dev', 'webserver', 'watch']));
 // gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);
