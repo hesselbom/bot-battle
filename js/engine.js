@@ -127,6 +127,7 @@
             return {
                 bot: {
                     id: b.bot.id,
+                    name: b.bot.bot.name,
                     pos: b.bot.pos,
                     health: b.bot.health,
                     prevCommand: b.bot.prevCommand,
@@ -176,6 +177,7 @@
                 }), function(b, i) {
                     return {
                         id: b.id,
+                        name: b.bot.name,
                         pos: b.pos,
                         health: b.health,
                         prevCommand: b.prevCommand,

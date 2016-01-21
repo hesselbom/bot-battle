@@ -155,6 +155,6 @@ gulp.task('watch',function() {
     gulp.watch('fonts/**/*', ['iconfont']);
 });
 
-gulp.task('build:dev', gulpsync.sync(['clean:tmp', 'iconfont', 'images', 'scripts', 'scripts:bots', 'inject-bots', 'templates', 'inject-sass', 'styles']));
+gulp.task('build:dev', gulpsync.sync(['clean:tmp', 'iconfont', 'images', 'scripts:bots', 'scripts', 'inject-bots', 'templates', 'inject-sass', 'styles']));
 gulp.task('default', gulpsync.sync(['build:dev', 'webserver', 'watch']));
 // gulp.task('build', ['clean:prod', 'build:dev', 'copy:prod', 'templates:prod', 'styles:prod']);

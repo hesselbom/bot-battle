@@ -68,6 +68,7 @@ The available properties on the Bot object is the following
 Property    | Description
 ----------- | -------------
 id          | Bot id
+name        | Bot name
 pos         | Current position [Vector2]
 health      | Current health
 prevCommand | The command the bot called the previous frame

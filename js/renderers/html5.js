@@ -22,7 +22,7 @@ window.Renderer = (function($) {
             }).appendTo($arena);
             $('<div class="health">').appendTo($el);
             bot.$el = $el;
-            this.updatePos(bot);
+            this._updatePos(bot);
         },
         botHit: function(bot) {
             $('.health', bot.$el).css('width', Math.round(100 * (bot.health / BotBattle.MAX_HEALTH))+'%');
