@@ -93,8 +93,37 @@ window.Renderer = (function($) {
                 BotBattle.ARENA_WIDTH + BotBattle.BOT_WIDTH * 3,
                 32);
 
+            $arena.append($('<a data-fullscreen class="battlefield__fullscreen">Fullscreen</a>')
+                .click(this._toggleFullscreen.bind(this)));
+
             this._setOriginalCamera();
             this._render();
+        },
+
+        _toggleFullscreen: function() {
+            var _this = this;
+
+            if ($('.battlefield-wrapper').hasClass('_fullscreen')) {
+                $('.battlefield-wrapper').removeClass('_fullscreen');
+                $(window).off('resize.fullscreen');
+
+                var width = BotBattle.ARENA_WIDTH + BotBattle.BOT_WIDTH,
+                    height = BotBattle.ARENA_HEIGHT + BotBattle.BOT_HEIGHT;
+
+                _this.camera.aspect = width / height;
+                _this.camera.updateProjectionMatrix();
+                _this.renderer.setSize( width, height );
+            }
+            else {
+                $('.battlefield-wrapper').addClass('_fullscreen');
+
+                $(window).on('resize.fullscreen', function() {
+                    _this.camera.aspect = window.innerWidth / window.innerHeight;
+                    _this.camera.updateProjectionMatrix();
+                    _this.renderer.setSize( window.innerWidth, window.innerHeight );
+                });
+                $(window).resize();
+            }
         },
 
         _setOriginalCamera: function() {
