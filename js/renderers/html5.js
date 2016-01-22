@@ -30,6 +30,9 @@ window.Renderer = (function($) {
         killBot: function(bot) {
             bot.$el.addClass('_dead');
         },
+        startingAnimation: function(callback) {
+            return false;
+        },
 
         _render: function() {
             var _this = this;

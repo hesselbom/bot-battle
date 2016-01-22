@@ -16,6 +16,7 @@ window.Renderer = (function($) {
 
             this.scene = new THREE.Scene();
             this.camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 2000 );
+            this.camera.up = new THREE.Vector3(0,0,1);
 
             this.renderer = new THREE.WebGLRenderer();
             this.renderer.setClearColor( 0xf0f0f0 );
@@ -92,13 +93,16 @@ window.Renderer = (function($) {
                 BotBattle.ARENA_WIDTH + BotBattle.BOT_WIDTH * 3,
                 32);
 
+            this._setOriginalCamera();
+            this._render();
+        },
+
+        _setOriginalCamera: function() {
             this.camera.position.x = 0;
             this.camera.position.y = -500;
             this.camera.position.z = 500;
             this.camera.lookAt(this.scene.position);
             this.camera.position.y = -700;
-
-            this._render();
         },
 
         _addWall: function(x, y, width, height) {
@@ -148,14 +152,14 @@ window.Renderer = (function($) {
                 }
             );
 
-            var healthbarbar = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xcccccc }));
-            healthbarbar.scale.set(32, 3, 1);
-            healthbarbar.position.set(0, 10.1, 30);
-            mesh.add( healthbarbar );
+            // var healthbarbar = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xcccccc }));
+            // healthbarbar.scale.set(32, 3, 1);
+            // healthbarbar.position.set(0, 10.1, 30);
+            // mesh.add( healthbarbar );
 
             var healthbar = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x8cad6c }));
             healthbar.scale.set(32, 3, 1);
-            healthbar.position.set(0, 10, 30);
+            healthbar.position.set(0, 0, 30);
             mesh.add( healthbar );
 
             bot.mesh = mesh;
@@ -173,6 +177,54 @@ window.Renderer = (function($) {
             bot.mesh.material.opacity = 0.3;
         },
 
+        startingAnimation: function(callback) {
+            var _this = this;
+
+            var currentAnimatingIndex = 0;
+            var animationTimer = 0;
+            var timeout = 300;
+
+            // callback();
+
+            // this.camera.position.x = 200;
+            // this.camera.position.y = -200;
+            // this.camera.position.z = 100;
+            // console.log(this.scene.position, this._getEntityWorldPosition(bot), bot.pos);
+            // this.camera.lookAt(new THREE.Vector3(350, -350, 0));
+
+            function step() {
+                var bot = _this._engine.bots[currentAnimatingIndex],
+                    percentage = animationTimer / timeout;
+
+                if (animationTimer === 0) {
+                    $('.battlefield__name').remove();
+                    $arena.append($('<div class="battlefield__name">').text(bot.bot.name));
+                }
+
+                _this.camera.position.x = (bot.pos.x - 400) * 0.6 - 15 + percentage * 30;
+                _this.camera.position.y = (400 - bot.pos.y) * 0.6 - 15 + percentage * 30;
+                _this.camera.position.z = 100;
+                _this.camera.lookAt(new THREE.Vector3(bot.pos.x - 400, 400 - bot.pos.y, 0));
+
+                if (animationTimer >= timeout) {
+                    currentAnimatingIndex++;
+                    animationTimer = -1;
+
+                    if (currentAnimatingIndex >= _this._engine.bots.length) {
+                        $('.battlefield__name').remove();
+                        _this._setOriginalCamera();
+                        callback();
+                        clearInterval(_this._animationInterval);
+                    }
+                }
+
+                animationTimer++;
+            }
+            this._animationInterval = setInterval(step, this._engine.getFps());
+
+            return true;
+        },
+
         _render: function() {
             var _this = this;
             this.renderer.render( this.scene, this.camera );
@@ -186,10 +238,15 @@ window.Renderer = (function($) {
             });
         },
 
+        _getEntityScenePosition: function(entity) {
+            return new THREE.Vector3(entity.pos.x, BotBattle.ARENA_HEIGHT - entity.pos.y, 0);
+        },
+
         _updatePos: function(entity) {
             if (typeof entity.mesh !== 'undefined') {
-                entity.mesh.position.x = entity.pos.x;
-                entity.mesh.position.y = BotBattle.ARENA_HEIGHT - entity.pos.y;
+                var p = this._getEntityScenePosition(entity);
+                entity.mesh.position.x = p.x;
+                entity.mesh.position.y = p.y;
             }
         }
     };

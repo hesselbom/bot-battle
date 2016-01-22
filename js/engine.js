@@ -43,10 +43,19 @@
     var engine = {
             bots: [],
             bullets: [],
-            running: false
+            running: false,
+            getFps: function() {
+                var $input = $('[data-fps]'),
+                    fps = parseInt($input.val());
+                if (fps <= 0) fps = 1;
+                if (fps >= 1000) fps = 1000;
+                $input.val(fps);
+                return 1000 / fps;
+            }
         },
         _runningInterval,
-        _botIds = 1;
+        _botIds = 1,
+        _firstTimePlaying = true;
 
     function degToVec(degreesOrVector) {
         if (degreesOrVector instanceof Vector2) {
@@ -225,18 +234,22 @@
         $('#battlefield').append($('<div class="battlefield__winner">').append($('<span>').text(bot.bot.name + ' won!')));
     }
 
-    function getFps() {
-        var $input = $('[data-fps]'),
-            fps = parseInt($input.val());
-        if (fps <= 0) fps = 1;
-        if (fps >= 1000) fps = 1000;
-        $input.val(fps);
-        return 1000 / fps;
+    function animationCallback() {
+        _firstTimePlaying = false;
+        _runningInterval = setInterval(step, engine.getFps());
     }
 
     function play() {
         pause();
-        _runningInterval = setInterval(step, getFps());
+
+        if (_firstTimePlaying) {
+            if (!window.Renderer.startingAnimation(animationCallback)) {
+                animationCallback();
+            }
+        }
+        else {
+            _runningInterval = setInterval(step, engine.getFps());
+        }
 
         $('[data-play]').addClass('disabled');
         $('[data-pause]').removeClass('disabled');
