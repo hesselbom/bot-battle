@@ -209,7 +209,13 @@
                     }
                 });
 
-                var choice = bot.bot.update(bot.pos, bot.health, bot.reload, availableBots, availableBullets);
+                var choice = DoNothing;
+                try {
+                    choice = bot.bot.update(bot.pos, bot.health, bot.reload, availableBots, availableBullets);
+                }
+                catch(e) {
+                    console.log(bot.bot.name + " got an error: " + e);
+                }
                 switch(choice.id) {
                     case _MoveUp:    bot.pos.y--; break;
                     case _MoveDown:  bot.pos.y++; break;
