@@ -173,11 +173,16 @@ window.Renderer = (function($) {
             new THREE.TextureLoader().load(
                 bot.bot.image,
                 function ( texture ) {
-                    var material = new THREE.MeshPhongMaterial( {
-                        map: texture,
-                        lightMap: texture
-                    } );
-                    mesh.material = material;
+                    new THREE.TextureLoader().load(
+                        (typeof bot.bot.lightmap !== 'undefined' ? bot.bot.lightmap : '/img/lightmap.png'),
+                        function ( lightmap ) {
+                            var material = new THREE.MeshPhongMaterial( {
+                                map: texture,
+                                lightMap: lightmap
+                            } );
+                            mesh.material = material;
+                        }
+                    );
                 }
             );
 
