@@ -202,10 +202,10 @@
                     return {
                         id: b.id,
                         name: b.bot.name,
-                        pos: b.pos,
+                        pos: b.pos.clone(),
                         health: b.health,
                         prevCommand: b.prevCommand,
-                        prevPos: b.prevPos
+                        prevPos: (b.prevPos ? b.prevPos.clone() : b.prevPos)
                     }
                 });
 
