@@ -163,7 +163,7 @@
             // Is hitting other player?
             var hitPlayer = false;
             $.each(engine.bots, function(i, bot) {
-                if (bot !== bullet.bot && pointInRectangle(bullet.pos, bot.topLeft, bot.btmRight)) {
+                if (bot !== bullet.bot && pointInRectangle(bullet.pos, bot.topLeft, bot.btmRight) && bot.health > 0) {
                     bot.health--;
                     window.Renderer.botHit(bot);
                     if (bot.health <= 0)
