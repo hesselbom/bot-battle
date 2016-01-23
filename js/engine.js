@@ -145,9 +145,9 @@
                     prevCommand: b.bot.prevCommand,
                     prevPos: b.bot.prevPos
                 },
-                pos: b.pos,
-                dir: b.dir,
-                vel: b.vel
+                pos: b.pos.clone(),
+                dir: b.dir.clone(),
+                vel: b.vel.clone()
             }
         });
 
