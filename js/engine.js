@@ -5,7 +5,7 @@
         _MoveLeft = 4,
         _MoveRight = 5,
         _Shoot = 6,
-        RELOAD_FRAMES = 30,
+        RELOAD_FRAMES = 70,
         MAX_HEALTH = 5,
         BULLET_SPEED = 2,
         BOT_WIDTH = 32,
