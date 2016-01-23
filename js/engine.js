@@ -230,9 +230,14 @@
                 }
                 bot.pos = bot.pos.clamp(MIN_POS, MAX_POS);
                 updateBounds(bot);
-                bot.prevCommand = choice;
-                bot.prevPos = bot.pos.clone();
+                bot._prevCommand = choice;
+                bot._prevPos = bot.pos.clone();
             }
+        });
+
+        $.each(engine.bots, function(i, bot) {
+            bot.prevCommand = bot._prevCommand;
+            bot.prevPos = bot._prevPos;
         });
     }
 
