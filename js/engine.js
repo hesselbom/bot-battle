@@ -55,7 +55,11 @@
         },
         _runningInterval,
         _botIds = 1,
-        _firstTimePlaying = true;
+        _firstTimePlaying = true,
+        _gameOver = false,
+        _endedADraw = false,
+        _timerSteps = 10,
+        _timer = 1000 * 60 * 5;
 
     function degToVec(degreesOrVector) {
         if (degreesOrVector instanceof Vector2) {
@@ -135,6 +139,46 @@
     }
 
     function step() {
+        if (!_gameOver) {
+            _timer -= _timerSteps;
+            var fullSeconds = _timer / 1000;
+            var seconds = Math.max(0, Math.floor(fullSeconds % 60));
+            var mins = Math.max(0, Math.floor(fullSeconds / 60));
+            $('[data-timer]').text(mins + ":" + (seconds < 10 ? '0' : '') + seconds);
+
+            if (seconds <= 0 && mins <= 0) {
+                var highest = null, someoneWon = false;
+
+                $.each(engine.bots, function(i, bot) {
+                    if (highest === null) {
+                        highest = bot;
+                    }
+                    else if (bot.health > highest.health) {
+                        someoneWon = true;
+                        highest = bot;
+                    }
+                });
+
+                if (someoneWon) {
+                    $.each(engine.bots, function(i, bot) {
+                        if (bot.id !== highest.id) {
+                            bot.health = 0;
+                            window.Renderer.botHit(bot);
+                            window.Renderer.killBot(bot);
+                        }
+                    });
+                    botWon(highest);
+                }
+                else {
+                    draw();
+                }
+            }
+        }
+
+        if (_endedADraw) {
+            return;
+        }
+
         var availableBullets = $.map(engine.bullets, function(b, i) {
             return {
                 bot: {
@@ -242,7 +286,18 @@
     }
 
     function botWon(bot) {
-        $('#battlefield').append($('<div class="battlefield__winner">').append($('<span>').text(bot.bot.name + ' won!')));
+        if ($('.battlefield__winner').length === 0) {
+            $('#battlefield').append($('<div class="battlefield__winner">').append($('<span>').text(bot.bot.name + ' won!')));
+        }
+        _gameOver = true;
+    }
+
+    function draw(bot) {
+        if ($('.battlefield__winner').length === 0) {
+            $('#battlefield').append($('<div class="battlefield__winner">').append($('<span>').text('Draw!')));
+        }
+        _gameOver = true;
+        _endedADraw = true;
     }
 
     function animationCallback() {
