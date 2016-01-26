@@ -255,7 +255,7 @@
 
                 var choice = DoNothing;
                 try {
-                    choice = bot.bot.update(bot.pos, bot.health, bot.reload, availableBots, availableBullets);
+                    choice = bot.bot.update(bot.pos.clone(), bot.health, bot.reload, availableBots, availableBullets);
                 }
                 catch(e) {
                     console.log(bot.bot.name + " got an error: " + e);
