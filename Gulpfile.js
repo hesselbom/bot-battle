@@ -47,7 +47,7 @@ gulp.task('scripts:bots', function() {
     return gulp.src('js/bots/dev/*.js', {base: './js/bots/dev'})
         .pipe(obfuscate({
             replaceMethod: obfuscate.ZALGO,
-            exclude: ['name', 'image', 'init', 'update',
+            exclude: ['name', 'image', 'init', 'update', 'pos',
                 // Vector2D
                 'x', 'y',
                 'set',
