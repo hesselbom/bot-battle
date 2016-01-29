@@ -21,11 +21,15 @@ This will run a server at __localhost:1337__ with all the bots and battlefield
 
 ### Global object
 
-Property            | Description
-------------------- | -------------
-BotBattle.MIN_POS    | Minimum position on map as Vector2
-BotBattle.MAX_POS    | Maximum position on map as Vector2
-BotBattle.MAX_HEALTH | Maximum health on a bot
+Property               | Description
+---------------------- | -------------
+BotBattle.MIN_POS      | Minimum position on map as Vector2
+BotBattle.MAX_POS      | Maximum position on map as Vector2
+BotBattle.MAX_HEALTH   | Maximum health on a bot
+BotBattle.BOT_WIDTH    | Bot width (32)
+BotBattle.BOT_HEIGHT   | Bot height (32)
+BotBattle.ARENA_WIDTH  | Arena width (800)
+BotBattle.ARENA_HEIGHT | Arena height (800)
 
 
 ### Methods
@@ -33,7 +37,7 @@ BotBattle.MAX_HEALTH | Maximum health on a bot
 #### init
 Parameter | Description
 --------- | -------------
-id        | Bot id, used to compare bots
+id        | Your bot id, used to compare bots
 
 This method gets called when creating bot. To setup initial values.
 
@@ -44,8 +48,8 @@ This method gets called every frame. You should always return a command for the 
 ##### Parameters
 Parameter | Description
 --------- | -------------
-pos       | My position as Vector2
-health    | My health left
+pos       | Your position as Vector2
+health    | Your health left
 reload    | Amount of frames left until you can shoot again
 bots      | An array of all bots (excluding you)
 bullets   | An array of all bullets (including your own)
