@@ -53,9 +53,20 @@
                 return 1000 / fps;
             }
         },
+        _storedEngine,
         _runningInterval,
         _botIds = 1,
+        _bulletIds = 1,
         _firstTimePlaying = true,
+        _winnerBot,
+        _replayRunning = false,
+        _storedReplay = [],
+        _replayLength = 300,
+        _replayMinSpeed = 0.1,
+        _replayMaxSpeed = 0.5,
+        _replayLengthExtraStart = 50,
+        _replayLengthExtraEnd = 50,
+        _replayStep = 0,
         _gameOver = false,
         _endedADraw = false,
         _timerSteps = 10,
@@ -118,6 +129,7 @@
     function addBullet(bot, dir) {
         var direction = degToVec(dir).normalize();
         var bullet = {
+            id: _bulletIds++,
             bot: bot,
             pos: bot.pos.clone(),
             dir: direction,
@@ -167,7 +179,7 @@
                             window.Renderer.killBot(bot);
                         }
                     });
-                    botWon(highest);
+                    botWon(highest, null);
                 }
                 else {
                     draw();
@@ -179,115 +191,252 @@
             return;
         }
 
-        var availableBullets = $.map(engine.bullets, function(b, i) {
-            return {
-                bot: {
-                    id: b.bot.id,
-                    name: b.bot.bot.name,
-                    pos: b.bot.pos,
-                    health: b.bot.health,
-                    prevCommand: b.bot.prevCommand,
-                    prevPos: b.bot.prevPos
-                },
-                pos: b.pos.clone(),
-                dir: b.dir.clone(),
-                vel: b.vel.clone()
+        if (_replayRunning) {
+            if (_replayStep >= 0 && _replayStep < _replayLength) {
+                var replayData = _storedReplay[Math.floor(_replayStep)],
+                    replayDataNext = _storedReplay[Math.ceil(_replayStep)],
+                    percentage = _replayStep - Math.floor(_replayStep);
+
+                if (_replayStepFirst) {
+                    _storedEngine = { bots: $.extend(true, [], engine.bots), bullets: $.extend(true, [], engine.bullets) };
+
+                    while (engine.bullets.length > 0) {
+                        window.Renderer.hideBullet(engine.bullets[engine.bullets.length - 1]);
+                        engine.bullets.pop();
+                    }
+
+                    $.each(replayData.bots, function(i, bot) {
+                        if (bot.health > 0 && engine.bots[i].health <= 0) {
+                            window.Renderer.unkillBot(engine.bots[i]);
+                        }
+                        engine.bots[i].health = bot.health;
+                    });
+
+                    $.each(replayData.bullets, function(i, bullet) {
+                        var b = $.extend(true, [], bullet);
+                        b.pos = b.pos.clone();
+                        engine.bullets.push(b);
+                        window.Renderer.addBullet(b);
+                    });
+
+                    _replayStepFirst = false;
+                }
+                else {
+                    $.each(engine.bots, function(i, bot) {
+                        if (replayDataNext) {
+                            bot.pos.lerpVectors(replayData.bots[i].pos, replayDataNext.bots[i].pos, percentage);
+                        }
+                        else {
+                            bot.pos.set(replayData.bots[i].pos.x, replayData.bots[i].pos.y);
+                        }
+
+                        if (replayData.bots[i].health < bot.health) {
+                            bot.health = replayData.bots[i].health;
+                            window.Renderer.botHit(bot);
+                        }
+
+                        if (bot.health <= 0)
+                            window.Renderer.killBot(bot);
+                    });
+
+                    // Add/remove bullets
+                    while (engine.bullets.length < replayData.bullets.length) {
+                        var bullet = { pos: new Vector2(0, 0) };
+                        engine.bullets.push(bullet);
+                        window.Renderer.addBullet(bullet);
+                    }
+                    while (engine.bullets.length > replayData.bullets.length) {
+                        window.Renderer.killBullet(engine.bullets.pop());
+                    }
+
+                    $.each(engine.bullets, function(i, bullet) {
+                        if (replayDataNext) {
+                            var bulletInNextFrame = null;
+                            for (var j = 0, len = replayDataNext.bullets.length; j < len; j++) {
+                                if (replayDataNext.bullets[j].id === replayData.bullets[i].id) {
+                                    bulletInNextFrame = replayDataNext.bullets[j];
+                                    break;
+                                }
+                            }
+
+                            if (bulletInNextFrame) {
+                                bullet.pos.lerpVectors(replayData.bullets[i].pos, bulletInNextFrame.pos, percentage);
+                            }
+                            else {
+                                bullet.pos.set(replayData.bullets[i].pos.x, replayData.bullets[i].pos.y);
+                            }
+                        }
+                        else {
+                            bullet.pos.set(replayData.bullets[i].pos.x, replayData.bullets[i].pos.y);
+                        }
+                    });
+                }
             }
-        });
 
-        engine.bullets = $.grep(engine.bullets, function(bullet, i) {
-            bullet.pos.add(bullet.vel);
-
-            // Is outside playing field?
-            if (!pointInRectangle(bullet.pos, DESTROY_MIN_POS, DESTROY_MAX_POS)) {
-                window.Renderer.killBullet(bullet);
-                return false;
+            if (_replayStep < 0 || _replayStep >= _replayLength) {
+                _replayStep = Math.round(_replayStep + 1);
+            }
+            else {
+                var t = (_replayLength - _replayStep) / _replayLength,
+                    A = _replayMinSpeed,
+                    B = _replayMaxSpeed,
+                    lerp = A + t * (B - A);
+                _replayStep += lerp;
             }
 
-            // Is hitting other player?
-            var hitPlayer = false;
-            $.each(engine.bots, function(i, bot) {
-                if (bot !== bullet.bot && pointInRectangle(bullet.pos, bot.topLeft, bot.btmRight) && bot.health > 0) {
-                    bot.health--;
-                    window.Renderer.botHit(bot);
-                    if (bot.health <= 0)
-                        window.Renderer.killBot(bot);
-                    hitPlayer = true;
-                    return false;
+            if (_replayStep >= _replayLength + _replayLengthExtraEnd) {
+                _replayRunning = false;
+                botWonReplayDone(_winnerBot);
+
+                // Restore bullets
+                $.each(engine.bullets, function(i, bullet) {
+                    window.Renderer.killBullet(bullet);
+                });
+
+                engine.bullets = _storedEngine.bullets;
+                $.each(engine.bullets, function(i, bullet) {
+                    window.Renderer.showBullet(bullet);
+                });
+            }
+        }
+        else {
+            var availableBullets = $.map(engine.bullets, function(b, i) {
+                return {
+                    bot: {
+                        id: b.bot.id,
+                        name: b.bot.bot.name,
+                        pos: b.bot.pos,
+                        health: b.bot.health,
+                        prevCommand: b.bot.prevCommand,
+                        prevPos: b.bot.prevPos
+                    },
+                    pos: b.pos.clone(),
+                    dir: b.dir.clone(),
+                    vel: b.vel.clone()
                 }
             });
-            if (hitPlayer) {
-                window.Renderer.killBullet(bullet);
 
-                var winner = null,
-                    botsAlive = 0;
+            engine.bullets = $.grep(engine.bullets, function(bullet, i) {
+                bullet.pos.add(bullet.vel);
+
+                // Is outside playing field?
+                if (!pointInRectangle(bullet.pos, DESTROY_MIN_POS, DESTROY_MAX_POS)) {
+                    window.Renderer.killBullet(bullet);
+                    return false;
+                }
+
+                // Is hitting other player?
+                var hitPlayer = null;
                 $.each(engine.bots, function(i, bot) {
-                    if (bot.health > 0) {
-                        winner = bot;
-                        botsAlive++;
+                    if (bot !== bullet.bot && pointInRectangle(bullet.pos, bot.topLeft, bot.btmRight) && bot.health > 0) {
+                        bot.health--;
+                        window.Renderer.botHit(bot);
+                        if (bot.health <= 0)
+                            window.Renderer.killBot(bot);
+                        hitPlayer = bot;
+                        return false;
                     }
                 });
-                if (botsAlive === 1) {
-                    botWon(winner);
-                }
-                return false;
-            }
+                if (hitPlayer) {
+                    window.Renderer.killBullet(bullet);
 
-            return true;
-        });
-
-        $.each(engine.bots, function(i, bot) {
-            if (bot.health > 0) {
-                if (bot.reload > 0) bot.reload--;
-
-                var availableBots = $.map($.grep(engine.bots, function(b, i) {
-                    return bot !== b;
-                }), function(b, i) {
-                    return {
-                        id: b.id,
-                        name: b.bot.name,
-                        pos: b.pos.clone(),
-                        health: b.health,
-                        prevCommand: b.prevCommand,
-                        prevPos: (b.prevPos ? b.prevPos.clone() : b.prevPos)
-                    }
-                });
-
-                var choice = DoNothing;
-                try {
-                    choice = bot.bot.update(bot.pos.clone(), bot.health, bot.reload, availableBots, availableBullets);
-                }
-                catch(e) {
-                    console.log(bot.bot.name + " got an error: " + e);
-                }
-                switch(choice.id) {
-                    case _MoveUp:    bot.pos.y--; break;
-                    case _MoveDown:  bot.pos.y++; break;
-                    case _MoveLeft:  bot.pos.x--; break;
-                    case _MoveRight: bot.pos.x++; break;
-                    case _Shoot:
-                        if (bot.reload <= 0) {
-                            window.Renderer.addBullet( addBullet(bot, choice.value) );
-                            bot.reload = RELOAD_FRAMES;
+                    var winner = null,
+                        botsAlive = 0;
+                    $.each(engine.bots, function(i, bot) {
+                        if (bot.health > 0) {
+                            winner = bot;
+                            botsAlive++;
                         }
-                        break;
+                    });
+                    if (botsAlive === 1) {
+                        botWon(winner, hitPlayer);
+                    }
+                    return false;
                 }
-                bot.pos = bot.pos.clamp(MIN_POS, MAX_POS);
-                updateBounds(bot);
-                bot._prevCommand = choice;
-                bot._prevPos = bot.pos.clone();
-            }
-        });
 
-        $.each(engine.bots, function(i, bot) {
-            bot.prevCommand = bot._prevCommand;
-            bot.prevPos = bot._prevPos;
-        });
+                return true;
+            });
+
+            $.each(engine.bots, function(i, bot) {
+                if (bot.health > 0) {
+                    if (bot.reload > 0) bot.reload--;
+
+                    var availableBots = $.map($.grep(engine.bots, function(b, i) {
+                        return bot !== b;
+                    }), function(b, i) {
+                        return {
+                            id: b.id,
+                            name: b.bot.name,
+                            pos: b.pos.clone(),
+                            health: b.health,
+                            prevCommand: b.prevCommand,
+                            prevPos: (b.prevPos ? b.prevPos.clone() : b.prevPos)
+                        }
+                    });
+
+                    var choice = DoNothing;
+                    try {
+                        choice = bot.bot.update(bot.pos.clone(), bot.health, bot.reload, availableBots, availableBullets);
+                    }
+                    catch(e) {
+                        console.log(bot.bot.name + " got an error: " + e);
+                    }
+                    switch(choice.id) {
+                        case _MoveUp:    bot.pos.y--; break;
+                        case _MoveDown:  bot.pos.y++; break;
+                        case _MoveLeft:  bot.pos.x--; break;
+                        case _MoveRight: bot.pos.x++; break;
+                        case _Shoot:
+                            if (bot.reload <= 0) {
+                                window.Renderer.addBullet( addBullet(bot, choice.value) );
+                                bot.reload = RELOAD_FRAMES;
+                            }
+                            break;
+                    }
+                    bot.pos = bot.pos.clamp(MIN_POS, MAX_POS);
+                    updateBounds(bot);
+                    bot._prevCommand = choice;
+                    bot._prevPos = bot.pos.clone();
+                }
+            });
+
+            $.each(engine.bots, function(i, bot) {
+                bot.prevCommand = bot._prevCommand;
+                bot.prevPos = bot._prevPos;
+            });
+
+            // Store replay data
+            var replayData = { bots: [], bullets: [] };
+
+            $.each(engine.bots, function(i, bot) {
+                replayData.bots.push({ bot: bot.bot, pos: bot.pos.clone(), health: bot.health });
+            });
+
+            $.each(engine.bullets, function(i, bullet) {
+                replayData.bullets.push({ id: bullet.id, pos: bullet.pos.clone() });
+            });
+
+            _storedReplay.push(replayData);
+            if (_storedReplay.length > _replayLength) _storedReplay.shift();
+        }
     }
 
-    function botWon(bot) {
+    function botWonReplayDone(bot) {
         if ($('.battlefield__winner').length === 0) {
             $('#battlefield').append($('<div class="battlefield__winner">').append($('<span>').text(bot.bot.name + ' won!')));
+        }
+    }
+
+    function botWon(bot, lastKilledBot) {
+        _winnerBot = bot;
+
+        if (window.Renderer.showReplay(bot, lastKilledBot)) {
+            _replayRunning = true;
+            _replayStep = -_replayLengthExtraStart;
+            _replayStepFirst = true;
+        }
+        else {
+            botWonReplayDone(_winnerBot);
         }
         _gameOver = true;
     }

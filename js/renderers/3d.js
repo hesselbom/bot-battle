@@ -1,7 +1,12 @@
 console.log("3d Renderer");
 
 window.Renderer = (function($) {
-    var $arena = $('#battlefield');
+    var $arena = $('#battlefield'),
+        _winnerBot,
+        _loserBot,
+        _cameraPercentage = 1,
+        _cameraFrom,
+        _cameraTo;
 
     function degInRad(deg) {
         return deg * Math.PI / 180;
@@ -96,7 +101,7 @@ window.Renderer = (function($) {
             $arena.append($('<a data-fullscreen class="battlefield__fullscreen">Fullscreen</a>')
                 .click(this._toggleFullscreen.bind(this)));
 
-            this._setOriginalCamera();
+            this._setOriginalCamera(true);
             this._render();
         },
 
@@ -126,12 +131,24 @@ window.Renderer = (function($) {
             }
         },
 
-        _setOriginalCamera: function() {
+        _setOriginalCamera: function(reset) {
             this.camera.position.x = 0;
             this.camera.position.y = -500;
             this.camera.position.z = 500;
             this.camera.lookAt(this.scene.position);
             this.camera.position.y = -700;
+
+            _cameraTo = {
+                quaternion: this.camera.quaternion.clone(),
+                position: this.camera.position.clone()
+            };
+
+            if (reset) {
+                _cameraFrom = {
+                    quaternion: this.camera.quaternion.clone(),
+                    position: this.camera.position.clone()
+                };
+            }
         },
 
         _addWall: function(x, y, width, height) {
@@ -158,6 +175,14 @@ window.Renderer = (function($) {
 
         killBullet: function(bullet) {
             this.sceneParent.remove(bullet.mesh);
+        },
+
+        hideBullet: function(bullet) {
+            bullet.mesh.visible = false;
+        },
+
+        showBullet: function(bullet) {
+            bullet.mesh.visible = true;
         },
 
         addBot: function(bot) {
@@ -206,9 +231,54 @@ window.Renderer = (function($) {
             bot.healthbar.position.x = -16 + 16 * (bot.health / BotBattle.MAX_HEALTH);
         },
 
+        unkillBot: function(bot) {
+            bot.mesh.material.transparent = false;
+            bot.mesh.material.opacity = 1;
+        },
+
         killBot: function(bot) {
             bot.mesh.material.transparent = true;
             bot.mesh.material.opacity = 0.3;
+        },
+
+        showReplay: function(winnerBot, loserBot) {
+            var _this = this;
+
+            if (!loserBot) {
+                return false;
+            }
+
+            _winnerBot = winnerBot;
+            _loserBot = loserBot;
+            _cameraPercentage = 0;
+            _cameraFrom = {
+                quaternion: this.camera.quaternion.clone(),
+                position: this.camera.position.clone()
+            };
+            _cameraTo = {
+                quaternion: this.camera.quaternion.clone(),
+                position: this.camera.position.clone()
+            };
+
+            function step() {
+                var diff = _loserBot.pos.clone().sub(_winnerBot.pos);
+
+                _this.camera.position.set(_loserBot.pos.x - 400 + diff.x / 2,
+                    400 - _loserBot.pos.y - diff.y / 2,
+                    200);
+                _this.camera.lookAt(new THREE.Vector3(_winnerBot.pos.x - 400, 400 - _winnerBot.pos.y, 0));
+
+                _cameraTo.position = _this.camera.position.clone();
+                _cameraTo.quaternion = _this.camera.quaternion.clone();
+
+                _cameraPercentage += 0.005;
+                if (_cameraPercentage >= 1) {
+                    _cameraPercentage = 1;
+                }
+            }
+            this._cameraInterval = setInterval(step, this._engine.getFps());
+
+            return true;
         },
 
         startingAnimation: function(callback) {
@@ -219,12 +289,11 @@ window.Renderer = (function($) {
             var timeout = 300;
 
             // callback();
-
-            // this.camera.position.x = 200;
-            // this.camera.position.y = -200;
-            // this.camera.position.z = 100;
-            // console.log(this.scene.position, this._getEntityWorldPosition(bot), bot.pos);
-            // this.camera.lookAt(new THREE.Vector3(350, -350, 0));
+            // return true;
+            _cameraFrom = {
+                quaternion: this.camera.quaternion.clone(),
+                position: this.camera.position.clone()
+            };
 
             function step() {
                 var bot = _this._engine.bots[currentAnimatingIndex],
@@ -235,18 +304,27 @@ window.Renderer = (function($) {
                     $arena.append($('<div class="battlefield__name">').text(bot.bot.name));
                 }
 
+                _cameraPercentage = Math.min(1, percentage * 3);
+
                 _this.camera.position.x = (bot.pos.x - 400) * 0.6 - 15 + percentage * 30;
                 _this.camera.position.y = (400 - bot.pos.y) * 0.6 - 15 + percentage * 30;
                 _this.camera.position.z = 100;
                 _this.camera.lookAt(new THREE.Vector3(bot.pos.x - 400, 400 - bot.pos.y, 0));
 
+                _cameraTo.position = _this.camera.position.clone();
+                _cameraTo.quaternion = _this.camera.quaternion.clone();
+
                 if (animationTimer >= timeout) {
                     currentAnimatingIndex++;
                     animationTimer = -1;
 
+                    _cameraFrom.position = _cameraTo.position.clone();
+                    _cameraFrom.quaternion = _cameraTo.quaternion.clone();
+
                     if (currentAnimatingIndex >= _this._engine.bots.length) {
                         $('.battlefield__name').remove();
-                        _this._setOriginalCamera();
+                        _this._setOriginalCamera(false);
+                        _this._startCameraAnimation(0.008);
                         callback();
                         clearInterval(_this._animationInterval);
                     }
@@ -259,10 +337,25 @@ window.Renderer = (function($) {
             return true;
         },
 
+        _startCameraAnimation: function(speed) {
+            var _speed = speed, _this = this;
+
+            _cameraPercentage = 0;
+
+            function step() {
+                _cameraPercentage += _speed;
+
+                if (_cameraPercentage >= 1) {
+                    _cameraPercentage = 1;
+                    clearInterval(_this._cameraInterval);
+                }
+            }
+
+            this._cameraInterval = setInterval(step, this._engine.getFps());
+        },
+
         _render: function() {
             var _this = this;
-            this.renderer.render( this.scene, this.camera );
-            requestAnimationFrame(this._render.bind(this));
 
             $.each(this._engine.bullets, function(i, bullet) {
                 _this._updatePos(bullet);
@@ -270,6 +363,12 @@ window.Renderer = (function($) {
             $.each(this._engine.bots, function(i, bot) {
                 _this._updatePos(bot);
             });
+
+            _this.camera.position.lerpVectors(_cameraFrom.position, _cameraTo.position, _cameraPercentage);
+            _this.camera.quaternion.copy(_cameraFrom.quaternion).slerp(_cameraTo.quaternion, _cameraPercentage);
+
+            this.renderer.render( this.scene, this.camera );
+            requestAnimationFrame(this._render.bind(this));
         },
 
         _getEntityScenePosition: function(entity) {

@@ -16,6 +16,12 @@ window.Renderer = (function($) {
         killBullet: function(bullet) {
             bullet.$el.remove();
         },
+        hideBullet: function(bullet) {
+            bullet.$el.hide();
+        },
+        showBullet: function(bullet) {
+            bullet.$el.show();
+        },
         addBot: function(bot) {
             var $el = $('<div class="bot">').css({
                 'background': 'url("'+bot.bot.image+'")'
@@ -29,6 +35,12 @@ window.Renderer = (function($) {
         },
         killBot: function(bot) {
             bot.$el.addClass('_dead');
+        },
+        unkillBot: function(bot) {
+            bot.$el.removeClass('_dead');
+        },
+        showReplay: function(winnerBot, loserBot) {
+            return true;
         },
         startingAnimation: function(callback) {
             return false;
